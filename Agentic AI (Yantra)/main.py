@@ -7,8 +7,8 @@ from groq import Groq
 from formats import *
 from records import *
 
-KEY_PATH = "path_to_groq_api_key_env_file"
-REPORT_PATH = "path_to_save_tax_report"
+KEY_PATH = r"C:\Users\safal\OneDrive\Documents\Programing\Python\Agentic AI (Yantra)\.gitignore\.env"
+REPORT_PATH = r"C:\Users\safal\OneDrive\Documents\Programing\Python\Agentic AI (Yantra)\output report\report.txt"
 
 
 def load_key():
