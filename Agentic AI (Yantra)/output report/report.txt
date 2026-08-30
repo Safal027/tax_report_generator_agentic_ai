@@ -1,0 +1,40 @@
+
+    FILING DETAILS: 
+    We operate a community school. Our collected monthly rent is 25,000 NPR. We request our 50% non-profit educational discount.
+
+
+    MUNICIPAL TAX REPORT
+
+    Target Property: PROP_KTM_101
+    Ward: WARD_1
+    Taxpayer PAN: PAN600123456
+
+    1. Declared Rent Correctness Check
+    - Declared Rent: NPR 25,000.00 / month
+    - Official Property Classification: Commercial
+    - Legal Minimum Rent Floor: NPR 60,000.00 / month
+    - Findings: UNDER REPORTED: The property is registered as Commercial with a standard rent of 60000.0, but the user declared 25000.0.
+
+    2. Non-Profit Discount Verification
+    - User Claim: 50% non-profit educational discount for community school
+    - Official PAN Registry Record: {'name': 'Sagarmatha Commercial Bank Ltd.', 'is_non_profit': False, 'category': 'Private Bank Enterprise'}
+    - Finding: REJECTED: The PAN registry shows the entity is a Private Bank Enterprise and is not a non-profit educational trust.
+
+    3. Violation Determination & Reasons
+    Status: TAX VIOLATION DETECTED
+    Reasons:
+    - User under-reported rent by 35000.0 (declared 25000.0 vs standard 60000.0) and falsely claimed a non-profit discount for a commercial bank entity.
+
+    4. Final Verdict & Corrected Demand Note
+    - Adjusted Monthly Base Rent: NPR 60,000.00
+    - Annual Base Taxable Income: NPR 720,000.00
+    - Annual Base Tax Due (10% House Rent Tax Rate): NPR 72,000.00
+    - Tax Discount Amount: NPR 0.00
+    - Tax Amount After Discount: NPR 72,000.00
+    - Under-Reporting Penalty Fine (20%): NPR 14,400.00
+    - Tax Amount After Penalty: NPR 86,400.00
+
+    TOTAL REVISED TAX DEMAND DUE: NPR 86,400.00
+
+    Additional Information/Request: None
+        
