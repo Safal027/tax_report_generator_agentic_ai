@@ -456,12 +456,6 @@ Also note: the Property Registry and the PAN Registry are validated **independen
 
 ## Who This Is For
 
-- **Students and developers learning agentic AI / LLM-orchestration patterns** — a compact, readable example of combining structured LLM output (JSON mode, strict schema) with deterministic downstream logic.
-- **Civic-tech / GovTech enthusiasts** prototyping ideas for Nepali municipal tax-audit tooling, or similar rent/property tax systems elsewhere.
-- **Portfolio reviewers, recruiters, or collaborators** evaluating a hybrid "AI reasoning + rule-based calculation" system design.
-- **Educators or workshop instructors** looking for a small, self-contained example of why financial arithmetic in an AI-assisted pipeline is often better handled by ordinary code than by the model itself.
-- **Hobbyists experimenting with the Groq API** who want a working, minimal example of JSON-mode structured extraction feeding into business logic.
-
 This is **not** intended for production tax administration, is not affiliated with any real government body, and should not be relied on for actual filings — see the [Disclaimer](#disclaimer).
 
 ---
