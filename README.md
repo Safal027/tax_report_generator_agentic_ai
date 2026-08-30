@@ -48,7 +48,7 @@
 
 ## Overview
 
-**Tax Report Generator (codename: "Yantra"** — Sanskrit/Nepali for *"machine"* or *"engine"**)** is a small **agentic AI** proof-of-concept that plays the role of a **Municipal Tax Audit Officer**.
+**Tax Report Generator is a small **agentic AI** proof-of-concept that plays the role of a **Municipal Tax Audit Officer**.
 
 A taxpayer describes their rental income filing in their own words — e.g. *"I collect 25,000 rupees a month in rent and I'd like the non-profit discount"* — along with their **Property ID** and **PAN (Permanent Account Number)**. The system then:
 
