@@ -7,8 +7,8 @@ from groq import Groq
 from formats import *
 from records import *
 
-KEY_PATH = r"C:\Users\safal\OneDrive\Documents\Programing\Python\Agentic AI (Yantra)\.gitignore\.env"
-REPORT_PATH = r"C:\Users\safal\OneDrive\Documents\Programing\Python\Agentic AI (Yantra)\output report\report.txt"
+KEY_PATH = "path_to_groq_api_key_env_file"
+REPORT_PATH = "path_to_save_tax_report"
 
 
 def load_key():
@@ -123,7 +123,11 @@ def extract_required_json_data(json_data):
 
 
 def calculate(official_data, extracted_data):
-    adj_rent = round(official_data[1].get(official_data[0].get("type")), 2)
+    if extracted_data[0] < official_data[1].get(official_data[0].get("type")):
+        adj_rent = round(official_data[1].get(official_data[0].get("type")), 2)
+    else:
+        adj_rent = extracted_data[0]
+
     yearly_adj_rent = round(adj_rent * 12, 2)
     yearly_base_tax = round(yearly_adj_rent * 0.10, 2)
 
