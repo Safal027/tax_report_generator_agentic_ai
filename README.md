@@ -1,4 +1,4 @@
-# Tax Report Generator — Agentic AI (Yantra)
+# Tax Report Generator — Agentic AI
 
 *Repository: `tax_report_generator_agentic_ai`*
 
@@ -18,7 +18,7 @@
 | **Domain** | Municipal rental/house tax audit (simulated Nepali metropolitan city context) |
 | **Input** | Property ID, PAN (taxpayer) ID, free-text filing declaration |
 | **Output** | Plain-text (`.txt`) municipal tax report written to disk |
-| **License** | Proprietary — All Rights Reserved (see [License](#license)) |
+| **License** | MIT — (see [License](#license)) |
 
 ---
 
