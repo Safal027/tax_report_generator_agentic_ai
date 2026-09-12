@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/status-prototype%2Fdemo-yellow.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-> An agentic AI system that takes a taxpayer's plain-English rental tax filing, cross-audits it against official municipal records, and produces a fully calculated, human-readable municipal tax report — modeled on a simulated Nepali metropolitan city (Kathmandu / Lalitpur) house-rent tax system.
+> An agentic AI system that takes a taxpayer's plain-English rental tax filing, cross-audits it against official municipal records, and produces a fully calculated, human-readable municipal tax report.
 
 | | |
 |---|---|
@@ -50,7 +50,7 @@
 
 **Tax Report Generator** is a small **agentic AI** proof-of-concept that plays the role of a **Municipal Tax Audit Officer**.
 
-A taxpayer describes their rental income filing in their own words — e.g. *"I collect 25,000 rupees a month in rent and I'd like the non-profit discount"* — along with their **Property ID** and **PAN (Permanent Account Number)**. The system then:
+A taxpayer describes their rental income filing in their own words — e.g. *"I collect 25,000 rupees a month in rent and I'd like the non-profit discount"* — along with their **Property ID** and **PAN ID**. The system then:
 
 1. Looks up the *actual* official records for that property and taxpayer (from a simulated municipal database),
 2. Sends the taxpayer's free-text claim, together with the official records, to a large language model acting as an auditor,
@@ -58,7 +58,7 @@ A taxpayer describes their rental income filing in their own words — e.g. *"I 
 4. Then — critically — hands the *numbers* off to **plain deterministic Python code**, which independently computes the actual tax, discount, and penalty amounts,
 5. And finally assembles everything into a formatted **Municipal Tax Report** text file.
 
-The project is built around a fictional/simulated Nepali context: **Kathmandu Metropolitan City** and **Lalitpur Metropolitan City**, four wards, NPR (Nepalese Rupee) currency, 9-digit IRD-style PAN numbers, and a 10% house-rent tax rate with a 20% under-reporting penalty — all defined in a small mock "government database" module.
+The project is built around a fictional/simulated Nepali context: **Kathmandu Metropolitan City** and **Lalitpur Metropolitan City**, four wards, NPR (Nepalese Rupee) currency, 9-digit IRD-style PAN numbers, and a mock government dataset embedded in the code.
 
 ---
 
@@ -67,23 +67,20 @@ The project is built around a fictional/simulated Nepali context: **Kathmandu Me
 For readers who just want to run it immediately (see [Installation and Setup](#installation-and-setup) for the full walkthrough):
 
 ```bash
-# 1. Move into the project folder (note the spaces/parentheses — quote the path)
-cd "Agentic AI (Yantra)"
+# 1. Move into the project folder's code directory
+cd "Agentic AI/code"
 
 # 2. Install the two external dependencies
 pip install groq python-dotenv
 
-# 3. Put your Groq API key in an .env file, e.g.:
+# 3. Put your Groq API key in the .env file, e.g.:
 echo 'GROQ_API_KEY="your_groq_api_key"' > .env
 
-# 4. Open main.py and set KEY_PATH and REPORT_PATH (see below) — this is required,
-#    the script will not run with the placeholder values left in place.
-
-# 5. Run it
+# 4. Run it
 python main.py
 ```
 
-When prompted, try Property ID `PROP_KTM_101`, PAN `PAN600123456`, and a filing declaration like *"My monthly rent is 25000 and I want the non-profit discount"* — this reproduces the exact scenario already included in the repo at `Agentic AI (Yantra)/output report/example_report.txt` (see [Example Input and Output](#example-input-and-output)).
+When prompted, try Property ID `PROP_KTM_101`, PAN `PAN600123456`, and a filing declaration like *"My monthly rent is 25000 and I want the non-profit discount"* — this reproduces the exact scenario in the [Example Input and Output](#example-input-and-output) section.
 
 ---
 
@@ -95,7 +92,7 @@ The pipeline is a single linear run through `main.py`, orchestrating `records.py
 User (CLI)
    │
    ▼
-[1] load_key() — reads GROQ_API_KEY from your .env file (KEY_PATH)
+[1] load_key() — reads GROQ_API_KEY from your .env file
    │
    ▼
 [2] get_user_prompt() — prompts for Property ID, re-asks until it
@@ -136,7 +133,7 @@ User (CLI)
     plain-text Municipal Tax Report
    │
    ▼
-[10] Report written to REPORT_PATH and a confirmation is printed
+[10] Report written to disk and a confirmation is printed
      to the console
 ```
 
@@ -149,10 +146,10 @@ User (CLI)
 - **Natural-language filing intake** — taxpayers describe their situation in plain English instead of filling out a rigid form.
 - **Automatic ID validation** — Property ID and PAN ID are checked against the mock registries before any AI call is made, with the CLI re-prompting until valid values are entered.
 - **LLM-powered compliance reasoning** — a single Groq call performs three checks in one structured pass: rent-correctness, non-profit discount eligibility, and overall violation detection.
-- **Deterministic, auditable math** — every rupee in the final report (base tax, discount, penalty, total) is computed by ordinary Python arithmetic, not generated by the model. This means the same inputs always produce the same numbers.
+- **Deterministic, auditable math** — every rupee in the final report (base tax, discount, penalty, total) is computed by ordinary Python arithmetic, not generated by the model. This means the same inputs always produce the same tax amount.
 - **Automatic 20% under-reporting penalty** whenever the declared rent is below the ward's legal minimum standard for that property type.
 - **50% non-profit educational discount** logic, cross-verified against the PAN registry's `is_non_profit` flag and `category` field.
-- **Self-contained mock government database** — 10 sample properties across 4 wards, 10 sample PAN taxpayer entities, ward-by-property-type rent floors, and a discount registry, all in a single `records.py` file, so the tool runs with zero external database setup.
+- **Self-contained mock government database** — 10 sample properties across 4 wards, 10 sample PAN taxpayer entities, ward-by-property-type rent floors, and a discount registry, all in a single `records.py` file.
 - **Human-readable output report** — a clean, structured `.txt` file suitable for printing or filing, saved automatically to disk.
 
 ---
@@ -160,27 +157,27 @@ User (CLI)
 ## Project Structure
 
 ```text
-tax_report_generator_agentic_ai-main/
-├── Agentic AI (Yantra)/
-│   ├── main.py                    # Entry point — orchestrates the full audit pipeline
-│   ├── formats.py                 # System prompt template + report Parameters/formatter
-│   ├── records.py                 # Mock "official government" datasets
-│   ├── output report/
-│   │   └── example_report.txt     # A real, pre-generated sample report
-│   └── .gitignore/
-│       └── .env                   # Placeholder for GROQ_API_KEY (see note below)
-├── .gitignore                     # Standard Python .gitignore (root)
-├── LICENCE                        # Proprietary license
-└── README.md                      # This file
+tax_report_generator_agentic_ai/
+├── Agentic AI/
+│   ├── code/
+│   │   ├── main.py                    # Entry point — orchestrates the full audit pipeline
+│   │   ├── formats.py                 # System prompt template + report formatter
+│   │   ├── records.py                 # Mock "official government" datasets
+│   │   └── .env                       # Placeholder for GROQ_API_KEY (see note below)
+│   └── output report/
+│       └── (generated reports will be saved here)
+├── .gitignore                         # Standard Python .gitignore (root)
+├── LICENSE                            # MIT License
+└── README.md                          # This file
 ```
 
-**Note on the `.env` location:** in this repository, the placeholder `.env` file lives inside a folder that is literally named `.gitignore/` (not a `.gitignore` *file* — a folder with that name), rather than at the project root. You can leave it there, or move/rename it to a conventional `Agentic AI (Yantra)/.env` — either works, as long as the `KEY_PATH` constant in `main.py` (see [Installation and Setup](#installation-and-setup)) points to wherever it actually lives.
+**Note on the `.env` location:** The `.env` file is now located at `Agentic AI/code/.env`. Create this file and add your Groq API key there before running the script.
 
 ---
 
 ## Requirements
 
-- **Python 3.9+** recommended (the code uses f-strings and `dataclasses`, so anything 3.7+ will technically run it, but a current interpreter is recommended). No specific version is pinned in the repo.
+- **Python 3.9+** recommended (the code uses f-strings and `dataclasses`, so anything 3.7+ will technically run it, but a current interpreter is recommended).
 - **External packages** (not bundled — no `requirements.txt` is included in the repo):
   - [`groq`](https://pypi.org/project/groq/) — official Groq Python SDK
   - [`python-dotenv`](https://pypi.org/project/python-dotenv/) — loads the `.env` file
@@ -193,11 +190,10 @@ tax_report_generator_agentic_ai-main/
 ## Installation and Setup
 
 1. **Get the code**
-   Download or clone the repository, then move into the project's actual source folder:
+   Download or clone the repository, then move into the project's code folder:
    ```bash
-   cd "Agentic AI (Yantra)"
+   cd "Agentic AI/code"
    ```
-   (The folder name has spaces and parentheses — always quote it in shell commands.)
 
 2. **(Optional but recommended) create a virtual environment**
    ```bash
@@ -211,30 +207,18 @@ tax_report_generator_agentic_ai-main/
    ```
 
 4. **Set up your Groq API key**
-   Create (or reuse) an `.env` file containing:
+   Create (or reuse) the `.env` file in the `Agentic AI/code/` directory containing:
    ```
    GROQ_API_KEY="your_groq_api_key"
    ```
    Get a key from the [Groq Console](https://console.groq.com) if you don't have one.
 
-5. **Edit the two path constants at the top of `main.py`.** This is the most important setup step and the one most likely to trip up a first run — the script ships with literal placeholder strings that **must** be replaced before it will work:
-   ```python
-   KEY_PATH = "path_to_groq_api_key_env_file"
-   REPORT_PATH = "path_to_save_tax_report"
-   ```
-   For example, if you keep the `.env` where it currently sits and want reports saved into the existing `output report/` folder:
-   ```python
-   KEY_PATH = ".gitignore/.env"
-   REPORT_PATH = "output report/my_tax_report.txt"
-   ```
-   `REPORT_PATH` must include the **filename**, not just a folder — `main.py` creates any missing parent directories automatically (`os.makedirs(..., exist_ok=True)`) but it still needs a full file path to write to.
-
-6. **Run it**
+5. **Run it**
    ```bash
    python main.py
    ```
 
-There are currently no command-line arguments, environment-variable overrides, or config files for these two paths — they are hardcoded constants you edit directly in the source.
+The script will prompt you for a Property ID, PAN ID, and your filing details. Generated reports will be saved to the `output report/` directory.
 
 ---
 
@@ -248,20 +232,22 @@ Once running, `main.py` walks you through three interactive prompts:
 | `Enter your PAN ID (for eg: PAN600123456):` | A PAN from the mock registry | Re-prompts until the ID exists in `PAN_REGISTRY` |
 | `Enter your filing details in simple language:` | A free-text description of your rent and any claims | Not validated — passed straight to the AI auditor |
 
-Both IDs are automatically upper-cased and trimmed, so `prop_km_101` and `PROP_KTM_101` are treated the same. See [The Mock Government Dataset](#the-mock-government-dataset) below for the full list of valid Property IDs and PAN IDs you can experiment with — for example:
+Both IDs are automatically upper-cased and trimmed, so `prop_km_101` and `PROP_KTM_101` are treated the same. See [The Mock Government Dataset](#the-mock-government-dataset) below for the full list of valid Property IDs and PANs.
+
+**Key behaviors to test:**
 
 - Declare a rent **below** the ward's standard for that property type → triggers the 20% under-reporting penalty.
 - Declare a rent **at or above** the standard → no penalty.
-- File under a PAN with `is_non_profit: true` **and** `category: "Educational Trust School"` while requesting the discount → the 50% discount should be approved (only two PANs in the sample data currently satisfy both conditions — see [The Mock Government Dataset](#the-mock-government-dataset)).
+- File under a PAN with `is_non_profit: true` **and** `category: "Educational Trust School"` while requesting the discount → the 50% discount should be approved (only two PANs in the sample data currently meet this condition).
 - File under any other PAN while requesting the discount → it should be rejected.
 
-The final report is written to whatever path you configured in `REPORT_PATH`, and a confirmation line — `Your Tax Report has been generated.` — is printed to the console.
+The final report is written to the `output report/` directory, and a confirmation line — `Your Tax Report has been generated.` — is printed to the console.
 
 ---
 
 ## Example Input and Output
 
-Below is the exact scenario already captured in the repository at `Agentic AI (Yantra)/output report/example_report.txt`, reconstructed as a full terminal session.
+Below is the exact scenario already captured in the repository at `Agentic AI/output report/example_report.txt`, reconstructed as a full terminal session.
 
 ### Sample terminal session
 
@@ -323,7 +309,7 @@ TOTAL REVISED TAX DEMAND DUE: NPR 86,400.00
 Additional Information/Request: None
 ```
 
-This example deliberately shows the system catching **two problems at once**: the taxpayer under-reported their rent (PROP_KTM_101 is officially a Commercial property, so its true rent floor is far higher than 25,000), *and* they tried to claim an educational non-profit discount despite the PAN on file belonging to a commercial bank. Both findings are visible in the report, and the final tax demand reflects the corrected rent plus the 20% penalty — with the (rejected) discount contributing NPR 0.
+This example deliberately shows the system catching **two problems at once**: the taxpayer under-reported their rent (PROP_KTM_101 is officially a Commercial property, so its true rent floor is far higher than what was declared) and falsely claimed a non-profit educational discount while being registered as a private commercial bank.
 
 ---
 
@@ -332,7 +318,7 @@ This example deliberately shows the system catching **two problems at once**: th
 Every generated report follows the same four-part structure defined in `formats.py`:
 
 1. **Filing Details** — a verbatim echo of what the taxpayer originally typed, kept at the top for reference.
-2. **Declared Rent Correctness Check** — compares the declared monthly rent against the property's official classification and that ward's legal minimum rent floor, plus the AI's plain-English findings (`CORRECT REPORTED` or `UNDER REPORTED`, with an explanation).
+2. **Declared Rent Correctness Check** — compares the declared monthly rent against the property's official classification and that ward's legal minimum rent floor, plus the AI's plain-English findings.
 3. **Non-Profit Discount Verification** — restates the user's discount claim (if any), the official PAN registry record on file, and whether the discount request was `APPROVED` or `REJECTED`.
 4. **Violation Determination & Reasons** — an overall status (`NO VIOLATION` or `TAX VIOLATION DETECTED`) with a written explanation.
 5. **Final Verdict & Corrected Demand Note** — the fully itemized calculation: adjusted monthly rent, annual taxable income, base tax, discount amount, penalty amount, and the final **Total Revised Tax Demand Due**.
@@ -341,7 +327,7 @@ Every generated report follows the same four-part structure defined in `formats.
 
 ## Tax Calculation Logic
 
-All of the financial math happens in `calculate()` inside `main.py`, using values from `TAX_RATES` and `DISCOUNT_REGISTRY` in `records.py`. It is deliberately kept out of the LLM's hands. The formula, step by step:
+All of the financial math happens in `calculate()` inside `main.py`, using values from `TAX_RATES` and `DISCOUNT_REGISTRY` in `records.py`. It is deliberately kept out of the LLM's hands. The formula in pseudocode is:
 
 ```
 adjusted_monthly_rent   = RENT_STANDARDS[ward][property_type]     # the official floor — see note below
@@ -361,11 +347,11 @@ else:
     total_due              = amount_after_discount
 ```
 
-> **Important nuance:** the *adjusted monthly rent* used for the tax base is always the ward's official standard for that property type — **not** the taxpayer's declared figure, even when the declared rent is *higher* than the standard. The declared rent is only used for one purpose: deciding whether the 20% under-reporting penalty applies (i.e., whether it falls below the standard).
+> **Important nuance:** the *adjusted monthly rent* used for the tax base is always the ward's official standard for that property type — **not** the taxpayer's declared figure, even when the declared rent is honestly reported *above* the standard. The tax base is capped at the official floor (the best case for the taxpayer) but never reduced below it. If the declared rent is below the floor, a 20% penalty is applied to flag the under-reporting.
 
 ### Worked example (a compliant filing, no violation)
 
-To illustrate the "clean" path — no under-reporting, no discount claimed — here's `PROP_KTM_105` (a Residential property in `WARD_3`, where the standard Residential rent is NPR 15,000/month), with a taxpayer who declares rent exactly at the legal floor and requests no discount:
+To illustrate the "clean" path — no under-reporting, no discount claimed — here's `PROP_KTM_105` (a Residential property in `WARD_3`, where the standard Residential rent is NPR 15,000/month), with a declaration of NPR 15,000/month:
 
 | Step | Value |
 |---|---|
@@ -394,7 +380,7 @@ If the same NPR 72,000 base tax from the main example *had* been paired with an 
 
 ## The Mock Government Dataset
 
-Everything the auditor "knows" lives in `records.py` as plain Python dictionaries — there is no external database, file, or API for the underlying records. This doubles as the full reference list of valid test inputs.
+Everything the auditor "knows" lives in `records.py` as plain Python dictionaries — there is no external database, file, or API for the underlying records. This doubles as the full reference list of all valid inputs.
 
 ### Ward & Property Registry (`WARD_REGISTRY`)
 
@@ -448,9 +434,9 @@ Everything the auditor "knows" lives in `records.py` as plain Python dictionarie
 |---|---|---|
 | `NON_PROFIT_EDUCATIONAL_DISCOUNT` | 50% | PAN entity has `is_non_profit = true` **and** `category = "Educational Trust School"` |
 
-Only one discount currently exists in the registry. Note that eligibility requires **both** conditions — being non-profit alone isn't enough: `PAN600123458` and `PAN700123456` are both non-profits, but their category is "Registered NGO," not "Educational Trust School," so under the current rule they do **not** qualify for this discount. Only `PAN600123457` and `PAN500123456` currently satisfy both conditions.
+Only one discount currently exists in the registry. Note that eligibility requires **both** conditions — being non-profit alone isn't enough: `PAN600123458` and `PAN700123456` are both non-profits, but neither qualifies because their category is not `"Educational Trust School"`.
 
-Also note: the Property Registry and the PAN Registry are validated **independently** — the tool does not check that the PAN you enter actually belongs to the owner listed for the Property ID you enter (see [Limitations and Notes](#limitations-and-notes)).
+Also note: the Property Registry and the PAN Registry are validated **independently** — the tool does not check that the PAN you enter actually belongs to the owner listed for the Property ID you enter.
 
 ---
 
@@ -464,10 +450,10 @@ This is **not** intended for production tax administration, is not affiliated wi
 
 The core design decision in this project is the split between what the **LLM** is trusted to do and what **plain Python** is trusted to do:
 
-- The **LLM** (`qwen/qwen3.8-27b` via Groq, called with `temperature=0.0` and a strict JSON response format) is used for the things language models are actually good at: reading a free-text human explanation, comparing it against structured records, and rendering a judgment call — is this rent correct, is this discount claim legitimate, is there a violation — in natural, simple language.
-- **Plain deterministic Python** (`calculate()`) is used for the thing you never want an LLM improvising: money. Once the LLM has extracted the declared rent and a discount decision as clean numeric fields, every downstream calculation — annual rent, base tax, discount amount, penalty, and total due — is ordinary arithmetic. The same inputs will always produce the same financial output, which matters a great deal in a tax context.
+- The **LLM** (`qwen/qwen3.8-27b` via Groq, called with `temperature=0.0` and a strict JSON response format) is used for the things language models are actually good at: reading a free-text human explanation, comparing it against structured official records, and reasoning through eligibility rules in natural language.
+- **Plain deterministic Python** (`calculate()`) is used for the thing you never want an LLM improvising: money. Once the LLM has extracted the declared rent and a discount decision as clean numeric fields in JSON, the Python code independently verifies the arithmetic and produces the final bill.
 
-`temperature=0.0` and JSON mode are used to keep the model's reasoning as consistent as possible run-to-run, though (as with any hosted LLM) bit-for-bit identical output across calls isn't a guarantee — which is exactly why the money math is not left to the model.
+`temperature=0.0` and JSON mode are used to keep the model's reasoning as consistent as possible run-to-run, though (as with any hosted LLM) bit-for-bit identical output across calls isn't guaranteed.
 
 The exact system prompt sent to the model (from `formats.py`) instructs it to act as a Municipal Tax Audit Officer and return **only** JSON in this shape:
 
@@ -490,7 +476,7 @@ The exact system prompt sent to the model (from `formats.py`) instructs it to ac
 }
 ```
 
-The prompt also explicitly forbids currency symbols, strings, or commas in the numeric fields, and forbids the literal strings `"null"` / `"None"` in place of a real JSON `null` — small but important guardrails that make the model's output safe to parse directly with `json.loads()`.
+The prompt also explicitly forbids currency symbols, strings, or commas in the numeric fields, and forbids the literal strings `"null"` / `"None"` in place of a real JSON `null` — small but important details to keep the JSON parsing robust.
 
 ---
 
@@ -498,14 +484,14 @@ The prompt also explicitly forbids currency symbols, strings, or commas in the n
 
 Documented honestly, since this is a prototype rather than a finished product:
 
-- **Two hardcoded path constants must be edited by hand** — `KEY_PATH` and `REPORT_PATH` in `main.py` are placeholder strings, not environment variables or CLI flags. The script will not run until you set them.
+- **No command-line arguments or config files** — the script runs as a simple top-to-bottom CLI with three interactive prompts.
 - **No `requirements.txt`** is included; dependencies must be installed manually (`groq`, `python-dotenv`).
-- **The "official records" are entirely in-memory and synthetic** — ten sample properties and ten sample PAN entities, hardcoded in `records.py`. There is no real database, no persistence between runs, and no way to add new records without editing the Python source directly.
-- **Property ID and PAN ID are validated independently.** The tool checks that each ID individually exists in its registry, but does **not** verify that the PAN you enter actually belongs to the property's registered owner.
-- **The tax base is always the ward's official standard rent for that property type — never the taxpayer's declared rent —** even in cases where the declared rent is honestly reported *above* the standard. Only the *penalty* decision depends on the declared figure.
-- **Only one discount type currently exists** (`NON_PROFIT_EDUCATIONAL_DISCOUNT`, 50%). The system prompt is written generally enough to reason about discount eligibility, but the sample dataset only defines this one rule.
-- **Minimal defensive error handling around the LLM's JSON response** — `extract_required_json_data()` uses `.get()` for the top-level keys (which softens missing-section errors), but a genuinely malformed or unexpected response from the model could still cause a downstream error, since the response isn't validated against a formal schema before use.
-- **The property `type` field must exactly match a key in `RENT_STANDARDS`** (`"Commercial"`, `"Residential"`, or `"Industrial"`) — there's no fuzzy matching or validation layer, so a typo'd or unrecognized type would cause a runtime error rather than a friendly message.
+- **The "official records" are entirely in-memory and synthetic** — ten sample properties and ten sample PAN entities, hardcoded in `records.py`. There is no real database, no persistence between runs.
+- **Property ID and PAN ID are validated independently.** The tool checks that each ID individually exists in its registry, but does **not** verify that the PAN you enter actually belongs to the property owner listed for the Property ID you enter.
+- **The tax base is always the ward's official standard rent for that property type — never the taxpayer's declared rent —** even in cases where the declared rent is honestly reported *above* the standard.
+- **Only one discount type currently exists** (`NON_PROFIT_EDUCATIONAL_DISCOUNT`, 50%). The system prompt is written generally enough to reason about discount eligibility, but the sample dataset only implements this single rule.
+- **Minimal defensive error handling around the LLM's JSON response** — `extract_required_json_data()` uses `.get()` for the top-level keys (which softens missing-section errors), but a genuinely malformed response will crash.
+- **The property `type` field must exactly match a key in `RENT_STANDARDS`** (`"Commercial"`, `"Residential"`, or `"Industrial"`) — there's no fuzzy matching or validation layer, so a typo'd or unrecognized type will cause a KeyError.
 - **Output is plain `.txt` only** — no PDF, HTML, or structured data (JSON/CSV) export of the final report.
 - **Single-session CLI only** — there is no report history, no database of past filings, and no way to look up a previously generated report other than the file itself.
 - **Requires a live Groq API call every run** — there is no offline or cached mode.
@@ -516,7 +502,7 @@ Documented honestly, since this is a prototype rather than a finished product:
 
 Some natural directions this project could grow in (none of these are currently implemented):
 
-- Move `KEY_PATH`/`REPORT_PATH` (and the model name) into environment variables or a small config file instead of hardcoded constants.
+- Move hardcoded paths and model name into environment variables or a small config file.
 - Add a `requirements.txt` / `pyproject.toml` for one-command dependency installation.
 - Cross-validate that the entered PAN actually corresponds to the registered owner of the entered Property ID.
 - Expand `DISCOUNT_REGISTRY` with additional rules — for example a senior-citizen residential rebate or an early-payment incentive — alongside the existing non-profit educational discount.
@@ -530,13 +516,15 @@ Some natural directions this project could grow in (none of these are currently 
 
 ## Disclaimer
 
-This project uses **entirely fictional, synthetic data** for demonstration and educational purposes. It is **not affiliated with, endorsed by, or connected to** the Kathmandu Metropolitan City, the Lalitpur Metropolitan City, Nepal's Inland Revenue Department, or any other real government body. Property records, PAN numbers, owner names, rent standards, and tax rates are all invented sample data. Nothing produced by this tool constitutes an official tax assessment, legal advice, or financial advice, and it should not be used to make real tax filings or decisions.
+This project uses **entirely fictional, synthetic data** for demonstration and educational purposes. It is **not affiliated with, endorsed by, or connected to** the Kathmandu Metropolitan City, the Lalitpur Metropolitan City, the Government of Nepal, or any real tax authority.
+
+The calculations and logic are **illustrative only** and do not represent actual tax law or procedure. For real tax filings in Nepal or any jurisdiction, consult a qualified tax professional or your official municipal tax office.
 
 ---
 
 ## License
 
-This repository is **fully open source**. Per the included `LICENCE` file:
+This repository is **fully open source**. Per the included `LICENSE` file:
 
 > MIT License
 > 
@@ -560,7 +548,7 @@ This repository is **fully open source**. Per the included `LICENCE` file:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-This is an open-source MIT license — rights to copy, modify, or redistribute this code are granted. See the [`LICENCE`](./LICENCE) file for the full, authoritative text.
+This is an open-source MIT license — rights to copy, modify, or redistribute this code are granted. See the [`LICENSE`](./LICENSE) file for the full, authoritative text.
 
 ---
 
